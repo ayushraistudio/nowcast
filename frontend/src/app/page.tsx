@@ -22,6 +22,11 @@ const MapComponent = dynamic(() => import('../components/MapComponent'), {
     loading: () => <div className="h-full w-full min-h-[300px] bg-slate-800 animate-pulse rounded-xl"></div>
 });
 
+// Auto-switch URL based on environment (Vercel Live vs Localhost)
+const API_BASE_URL = process.env.NODE_ENV === 'production' 
+    ? 'https://nowcast-backend.onrender.com' 
+    : 'http://127.0.0.1:8000';
+
 export default function Home() {
     const [activeTab, setActiveTab] = useState('dashboard');
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -41,12 +46,12 @@ export default function Home() {
             setLoading(true); 
             setError(null);
             
-            const response = await fetch(`http://127.0.0.1:8000/api/realtime-risk?lat=${location.lat}&lon=${location.lon}`);
+            const response = await fetch(`${API_BASE_URL}/api/realtime-risk?lat=${location.lat}&lon=${location.lon}`);
             if (!response.ok) throw new Error('API Sync Failed');
             const data = await response.json();
             setRiskData(data);
 
-            const historyResponse = await fetch(`http://127.0.0.1:8000/api/history?lat=${location.lat}&lon=${location.lon}`);
+            const historyResponse = await fetch(`${API_BASE_URL}/api/history?lat=${location.lat}&lon=${location.lon}`);
             if (historyResponse.ok) {
                 const hData = await historyResponse.json();
                 setTrendData(hData);
@@ -66,7 +71,7 @@ export default function Home() {
 
     // Fetch initial settings
     useEffect(() => {
-        fetch('http://127.0.0.1:8000/api/settings')
+        fetch(`${API_BASE_URL}/api/settings`)
             .then(res => res.json())
             .then(data => setIsRadarOn(data.radar_sync_enabled))
             .catch(console.error);
@@ -74,7 +79,7 @@ export default function Home() {
 
     const toggleRadar = async () => {
         try {
-            const res = await fetch('http://127.0.0.1:8000/api/settings/radar/toggle', { method: 'POST' });
+            const res = await fetch(`${API_BASE_URL}/api/settings/radar/toggle`, { method: 'POST' });
             const data = await res.json();
             setIsRadarOn(data.radar_sync_enabled);
         } catch (err) {
