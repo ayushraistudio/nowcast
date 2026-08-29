@@ -23,8 +23,8 @@ const MapComponent = dynamic(() => import('../components/MapComponent'), {
 });
 
 // Auto-switch URL based on environment (Vercel Live vs Localhost)
-const API_BASE_URL = process.env.NODE_ENV === 'production' 
-    ? ' https://rod-which-midwest-mate.trycloudflare.com ' 
+const API_BASE_URL = process.env.NODE_ENV === 'production'
+    ? 'https://rod-which-midwest-mate.trycloudflare.com'
     : 'http://127.0.0.1:8000';
 
 export default function Home() {
