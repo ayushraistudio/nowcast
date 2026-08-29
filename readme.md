@@ -6,7 +6,7 @@
 
 Monitor real-time weather conditions, analyze atmospheric patterns, and estimate thunderstorm and lightning risk for the next 30–60 minutes.
 
-[![Live Dashboard](https://img.shields.io/badge/Live%20Dashboard-Vercel-6C47FF?style=for-the-badge)](YOUR_VERCEL_URL)
+[![Live Dashboard](https://img.shields.io/badge/Live%20Dashboard-Vercel-6C47FF?style=for-the-badge)](https://nowcastai.vercel.app/)
 [![Backend API](https://img.shields.io/badge/Backend%20API-Render-46E3B7?style=for-the-badge)](YOUR_RENDER_URL)
 [![Project Guide](https://img.shields.io/badge/Documentation-Project%20Guide-4EA1FF?style=for-the-badge)](./PROJECTGUIDE.md)
 
@@ -18,7 +18,7 @@ Monitor real-time weather conditions, analyze atmospheric patterns, and estimate
 
 | Service | Deployment | Status |
 |---|---|---|
-| 🌐 Nowcast AI Dashboard | [Vercel](YOUR_VERCEL_URL) | 🟢 Live |
+| 🌐 Nowcast AI Dashboard | [Vercel](https://nowcastai.vercel.app/) | 🟢 Live |
 | ⚙️ FastAPI Backend | [Render](YOUR_RENDER_URL) | 🟢 Live |
 | 📖 Project Documentation | [PROJECTGUIDE.md](./PROJECTGUIDE.md) | 📚 Available |
 
