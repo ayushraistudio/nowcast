@@ -1,5 +1,32 @@
 # Nowcast AI
 
+<p align="center">
+
+### AI-Powered Thunderstorm & Lightning Nowcasting Platform
+
+Monitor real-time weather conditions, analyze atmospheric patterns, and estimate thunderstorm and lightning risk for the next 30–60 minutes.
+
+[![Live Dashboard](https://img.shields.io/badge/Live%20Dashboard-Vercel-6C47FF?style=for-the-badge)](YOUR_VERCEL_URL)
+[![Backend API](https://img.shields.io/badge/Backend%20API-Render-46E3B7?style=for-the-badge)](YOUR_RENDER_URL)
+[![Project Guide](https://img.shields.io/badge/Documentation-Project%20Guide-4EA1FF?style=for-the-badge)](./PROJECTGUIDE.md)
+
+</p>
+
+---
+
+## 🚀 Live Demo
+
+| Service | Deployment | Status |
+|---|---|---|
+| 🌐 Nowcast AI Dashboard | [Vercel](YOUR_VERCEL_URL) | 🟢 Live |
+| ⚙️ FastAPI Backend | [Render](YOUR_RENDER_URL) | 🟢 Live |
+| 📖 Project Documentation | [PROJECTGUIDE.md](./PROJECTGUIDE.md) | 📚 Available |
+
+---
+
+## 🌩️ What is Nowcast AI?
+
+
 ## Problem Statement
 
 India faces recurring risks from fast-developing thunderstorm and lightning events that can disrupt infrastructure, agriculture, transportation, and public safety. Traditional weather monitoring often reacts too late, leaving communities with little time to prepare. This project addresses the challenge of early, localized thunderstorm and lightning nowcasting by combining live weather observations, radar-based temporal patterns, and AI-driven risk prediction to provide timely, actionable insights for critical locations.
