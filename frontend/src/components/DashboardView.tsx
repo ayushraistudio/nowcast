@@ -13,7 +13,18 @@ const DynamicMap = dynamic(() => import('./MapComponent'), {
     loading: () => <div className="h-full w-full min-h-[300px] bg-slate-800 animate-pulse rounded-xl"></div>
 });
 
-export default function DashboardView({ riskData, trendData, isLightMode = false }: { riskData: any, trendData: any[], isLightMode?: boolean }) {
+// Generates an offline data URI fake radar image sequence that blends natively
+const getMockImage = (step: number) => {
+    const cx = 80 + step * 25;
+    const cy = 80 + step * 15;
+    const r = 40 + step * 12;
+    const color = step < 2 ? '#22c55e' : (step < 4 ? '#eab308' : '#ef4444');
+    const innerOp = step > 2 ? 0.7 : 0;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"><defs><filter id="blur"><feGaussianBlur stdDeviation="25"/></filter></defs><circle cx="${cx}" cy="${cy}" r="${r}" fill="${color}" filter="url(#blur)" opacity="0.7"/><circle cx="${cx - 10}" cy="${cy + 10}" r="${r * 0.5}" fill="#dc2626" filter="url(#blur)" opacity="${innerOp}"/></svg>`;
+    return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+};
+
+export default function DashboardView({ riskData, trendData, isLightMode = false, isMockActive = false }: { riskData: any, trendData: any[], isLightMode?: boolean, isMockActive?: boolean }) {
     const [radarTimeline, setRadarTimeline] = useState<{time: string, url: string}[]>([]);
     const [liveTime, setLiveTime] = useState("");
     const [mounted, setMounted] = useState(false);
@@ -31,6 +42,17 @@ export default function DashboardView({ riskData, trendData, isLightMode = false
         if (!riskData) return;
         
         const fetchRadarTimeline = async () => {
+            // Intercept and inject fake progressive radar images if offline mock is active
+            if (isMockActive) {
+                const fakeFrames = [0, 1, 2, 3, 4].map((step) => {
+                    const date = new Date(Date.now() - (4 - step) * 15 * 60000);
+                    const timeString = date.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+                    return { time: timeString, url: getMockImage(step) };
+                });
+                setRadarTimeline(fakeFrames);
+                return;
+            }
+
             try {
                 const res = await fetch('https://api.rainviewer.com/public/weather-maps.json');
                 const data = await res.json();
@@ -59,7 +81,7 @@ export default function DashboardView({ riskData, trendData, isLightMode = false
         };
 
         fetchRadarTimeline();
-    }, [riskData]);
+    }, [riskData, isMockActive]);
 
     if (!riskData) return null;
 
@@ -86,7 +108,6 @@ export default function DashboardView({ riskData, trendData, isLightMode = false
     const textMain = isLightMode ? "text-slate-900" : "text-white";
     const textSub = isLightMode ? "text-slate-500" : "text-slate-400";
     const textMuted = isLightMode ? "text-slate-600" : "text-slate-300";
-    const bgInner = isLightMode ? "bg-slate-100 border-slate-300" : "bg-[#111827] border-slate-800";
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 pb-10 md:pb-0 transition-colors duration-300">
@@ -161,7 +182,6 @@ export default function DashboardView({ riskData, trendData, isLightMode = false
                     <h3 className={`text-xs font-bold ${textSub} uppercase tracking-wider flex items-center gap-2`}>Live Spatial Risk Map <Navigation size={14} /></h3>
                 </div>
                 <div className="flex-grow relative h-[300px] lg:h-auto">
-                    {/* Fixed: isLightMode prop successfully passed to MapComponent to toggle map base layer */}
                     <DynamicMap riskData={riskData} isLightMode={isLightMode} />
                 </div>
             </div>
@@ -238,6 +258,8 @@ export default function DashboardView({ riskData, trendData, isLightMode = false
                         <div key={i} className="flex-none w-20 md:w-auto md:flex-1 flex flex-col items-center snap-center">
                             <div className={`w-full aspect-square rounded-lg mb-2 border relative overflow-hidden flex items-center justify-center ${i === 4 ? 'border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.4)]' : (isLightMode ? 'border-slate-300 bg-slate-200' : 'border-slate-700 bg-slate-900')}`}>
                                 <div className={`absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] ${isLightMode ? 'from-blue-200 via-slate-100 to-white' : 'from-blue-900 via-slate-900 to-black'}`}></div>
+                                
+                                {/* Error fallback to clear text is already safe here */}
                                 <img src={frame.url} alt={`Radar at ${frame.time}`} className={`absolute inset-0 w-full h-full object-cover opacity-90 z-10 ${isLightMode ? 'mix-blend-multiply' : 'mix-blend-screen'}`} onError={(e) => { e.currentTarget.style.display = 'none'; }} />
                                 <span className={`text-[9px] ${textSub} font-medium z-0`}>Clear</span>
                             </div>

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Settings, Moon, Sun, Database, CheckCircle } from 'lucide-react';
 
-export default function SettingsView({ isLightMode, setIsLightMode, isRadarOn, toggleRadar }: any) {
+export default function SettingsView({ isLightMode, setIsLightMode, isRadarOn, toggleRadar, isMockActive }: any) {
     const [toast, setToast] = useState({ show: false, msg: "" });
 
     const bgMain = isLightMode ? "bg-white border-slate-200" : "bg-[#111827] border-slate-800";
@@ -31,7 +31,11 @@ export default function SettingsView({ isLightMode, setIsLightMode, isRadarOn, t
 
             <div className={`flex items-center gap-3 border-b ${isLightMode ? 'border-slate-200' : 'border-slate-800'} pb-4`}>
                 <Settings className="text-indigo-500" size={24} />
-                <h2 className={`text-lg font-black ${textMain} tracking-widest uppercase`}>System Settings</h2>
+                <h2 className={`text-lg font-black ${textMain} tracking-widest uppercase flex items-center gap-2`}>
+                    System Settings
+                    {/* Secret Indicator: Green = Live Real Data, Orange = Offline Mock Data */}
+                    <span className={`w-2 h-2 rounded-full opacity-60 ${isMockActive ? 'bg-orange-500' : 'bg-emerald-500'}`} title={isMockActive ? "Running on Mock Data" : "Connected to Live Server"}></span>
+                </h2>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

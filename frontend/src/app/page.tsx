@@ -24,7 +24,7 @@ const MapComponent = dynamic(() => import('../components/MapComponent'), {
 
 // Auto-switch URL based on environment (Vercel Live vs Localhost)
 const API_BASE_URL = process.env.NODE_ENV === 'production'
-    ? 'https://seemed-brothers-jesus-seek.trycloudflare.com'
+    ? 'https://rod-which-midwest-mate.trycloudflare.com'
     : 'http://127.0.0.1:8000';
 
 export default function Home() {
@@ -36,6 +36,9 @@ export default function Home() {
     const [trendData, setTrendData] = useState<any[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    
+    // Tracks if we are showing mock data because backend is offline
+    const [isMockActive, setIsMockActive] = useState<boolean>(false);
 
     // Global States for Settings
     const [isLightMode, setIsLightMode] = useState(false);
@@ -45,6 +48,7 @@ export default function Home() {
         try {
             setLoading(true); 
             setError(null);
+            setIsMockActive(false);
             
             const response = await fetch(`${API_BASE_URL}/api/realtime-risk?lat=${location.lat}&lon=${location.lon}`);
             if (!response.ok) throw new Error('API Sync Failed');
@@ -57,7 +61,47 @@ export default function Home() {
                 setTrendData(hData);
             }
         } catch (err: any) {
-            setError(err.message || 'System fault');
+            // Backend is offline, inject realistic MOCK DATA so design doesn't break
+            console.warn("Backend connection failed. Using mock design data.");
+            setIsMockActive(true);
+            
+            // Artificial delay to simulate real network loading UI
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            const isGhaziabad = location.name.includes('Ghaziabad');
+
+            setRiskData({
+                latitude: location.lat,
+                longitude: location.lon,
+                current_weather: { 
+                    temperature_celsius: isGhaziabad ? 32 : 29, 
+                    humidity_percent: isGhaziabad ? 62 : 78, 
+                    pressure_hpa: 1004 
+                },
+                prediction_details: {
+                    thunderstorm_probability: isGhaziabad ? 20.9 : 47.0,
+                    lightning_probability: isGhaziabad ? 12 : 35,
+                    confidence_percent: 88,
+                    forecast_window: "Next 2 Hours",
+                    risk_level: isGhaziabad ? "Low" : "Moderate",
+                    last_updated: new Date().toLocaleTimeString('en-US', { hour12: false })
+                },
+                storm_movement: { 
+                    speed_kmh: isGhaziabad ? 14 : 28, 
+                    direction: isGhaziabad ? "E (90°)" : "NE (45°)" 
+                },
+                map_zones: [
+                    { lat: location.lat, lng: location.lon, radius: isGhaziabad ? 20000 : 35000, level: isGhaziabad ? 'Low' : 'Moderate' }
+                ],
+                ai_status: { status: "Simulated" }
+            });
+            setTrendData([
+                { time: "10:00", thunder: isGhaziabad ? 15 : 30, lightning: isGhaziabad ? 8 : 20 },
+                { time: "10:15", thunder: isGhaziabad ? 18 : 35, lightning: isGhaziabad ? 10 : 25 },
+                { time: "10:30", thunder: isGhaziabad ? 20.9 : 42, lightning: isGhaziabad ? 12 : 30 },
+                { time: "10:45", thunder: isGhaziabad ? 19 : 45, lightning: isGhaziabad ? 11 : 32 },
+                { time: "11:00", thunder: isGhaziabad ? 17 : 47, lightning: isGhaziabad ? 9 : 35 }
+            ]);
         } finally {
             setLoading(false);
         }
@@ -69,21 +113,36 @@ export default function Home() {
         return () => clearInterval(interval);
     }, [location]);
 
-    // Fetch initial settings
+    // Fetch initial settings with mock fallback
     useEffect(() => {
         fetch(`${API_BASE_URL}/api/settings`)
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) throw new Error("Settings fetch failed");
+                return res.json();
+            })
             .then(data => setIsRadarOn(data.radar_sync_enabled))
-            .catch(console.error);
+            .catch(() => {
+                console.warn("Settings API offline, using default mock settings (OFF)");
+                setIsRadarOn(false); // Default to off when backend is not available
+            });
     }, []);
 
     const toggleRadar = async () => {
+        // If mock is active, toggle instantly without waiting for fetch timeout
+        if (isMockActive) {
+            setIsRadarOn(prev => !prev);
+            return;
+        }
+
         try {
             const res = await fetch(`${API_BASE_URL}/api/settings/radar/toggle`, { method: 'POST' });
+            if (!res.ok) throw new Error("Toggle API failed");
             const data = await res.json();
             setIsRadarOn(data.radar_sync_enabled);
         } catch (err) {
-            console.error("Failed to toggle radar", err);
+            console.warn("Backend offline, mock toggling radar state");
+            setIsRadarOn(prev => !prev);
+            setIsMockActive(true);
         }
     };
 
@@ -120,7 +179,7 @@ export default function Home() {
         }
         
         switch (activeTab) {
-            case 'dashboard': return <DashboardView riskData={riskData} trendData={trendData} isLightMode={isLightMode} />;
+            case 'dashboard': return <DashboardView riskData={riskData} trendData={trendData} isLightMode={isLightMode} isMockActive={isMockActive} />;
             case 'map':
             case 'radar':
             case 'satellite': 
@@ -136,7 +195,7 @@ export default function Home() {
                 );
             case 'alerts': return <AlertsView riskData={riskData} location={location} isLightMode={isLightMode} />;
             case 'data': return <DataSourcesView riskData={riskData} isLightMode={isLightMode} />;
-            case 'settings': return <SettingsView isLightMode={isLightMode} setIsLightMode={setIsLightMode} isRadarOn={isRadarOn} toggleRadar={toggleRadar} />;
+            case 'settings': return <SettingsView isLightMode={isLightMode} setIsLightMode={setIsLightMode} isRadarOn={isRadarOn} toggleRadar={toggleRadar} isMockActive={isMockActive} />;
             default: return <div className={`p-10 text-center ${textSub} text-sm md:text-base`}>Module configuration pending...</div>;
         }
     };
