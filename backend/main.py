@@ -195,20 +195,36 @@ def get_history(lat: float = 28.66, lon: float = 77.43):
         history_data = [{"time": current_time, "thunder": 0, "lightning": 0}]
         
     return history_data
-
 @app.get("/api/realtime-risk")
 def get_realtime_risk(background_tasks: BackgroundTasks, lat: float = 28.66, lon: float = 77.43):
     try:
-        url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,surface_pressure,wind_speed_10m,wind_direction_10m&timezone=auto"
-        response = requests.get(url)
+        url = (
+            "https://api.open-meteo.com/v1/forecast"
+            f"?latitude={lat}&longitude={lon}"
+            "&current=temperature_2m,relative_humidity_2m,"
+            "surface_pressure,wind_speed_10m,wind_direction_10m"
+            "&timezone=auto"
+        )
+
+        response = requests.get(url, timeout=15)
+
+        print("Open-Meteo status:", response.status_code)
+        print("Open-Meteo response:", response.text[:2000])
+
+        response.raise_for_status()
+
         data = response.json()
         current_data = data.get("current", {})
-        
+
+        print("Current weather data:", current_data)
+
         temperature = current_data.get("temperature_2m", 0.0)
         humidity = current_data.get("relative_humidity_2m", 0.0)
         pressure = current_data.get("surface_pressure", 0.0)
         wind_speed = current_data.get("wind_speed_10m", 0.0)
-        
+
+        # Iske baad tumhara existing input_features wala code aayega.
+
         input_features = pd.DataFrame({
             'temperature': [temperature],
             'humidity': [humidity],
