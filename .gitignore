@@ -1,36 +1,36 @@
 # Python virtual environment
-
 venv/
 .venv/
 
 # Python cache
-
-**pycache**/
+__pycache__/
+**/__pycache__/
 *.py[cod]
 
 # Frontend dependencies and build
-
 frontend/node_modules/
 frontend/.next/
 frontend/out/
 
 # Environment variables
-
 .env
 .env.*
 !.env.example
 
 # Local database
-
 backend/nowcast_history.db
 
-# Local radar images
-
+# Local radar images and downloaded data
+backend/ml_models/radar_data_ghaziabad/
+backend/ml_models/radar_data_patna/
 ml_models/radar_data_ghaziabad/
 ml_models/radar_data_patna/
 
-# IDE and operating system files
+# Local radar cache and temporary data
+backend/ml_models/.cache.sqlite
+backend/ml_models/radar_sequence_tensor.pt
 
+# IDE and operating system files
 .vscode/
 .idea/
 .DS_Store
