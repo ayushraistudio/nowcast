@@ -1,5 +1,37 @@
+# Python virtual environment
+
 venv/
-__pycache__/
+.venv/
+
+# Python cache
+
+**pycache**/
+*.py[cod]
+
+# Frontend dependencies and build
+
 frontend/node_modules/
 frontend/.next/
+frontend/out/
+
+# Environment variables
+
 .env
+.env.*
+!.env.example
+
+# Local database
+
+backend/nowcast_history.db
+
+# Local radar images
+
+ml_models/radar_data_ghaziabad/
+ml_models/radar_data_patna/
+
+# IDE and operating system files
+
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
