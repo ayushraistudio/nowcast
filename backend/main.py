@@ -14,17 +14,16 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 # ==========================================
 # Path Configurations & Imports
 # ==========================================
-BASE_DIR = os.path.dirname(__file__)
-ML_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "ml_models"))
-sys.path.append(ML_DIR)
+# Path Configurations & Imports
+# ==========================================
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+ML_DIR = os.path.join(BASE_DIR, "ml_models")
 
-try:
-    from radar_pipeline import run_pipeline as download_new_radar_images
-    from radar_tensor_prep import prepare_radar_tensors
-    RADAR_SCRIPTS_AVAILABLE = True
-except ImportError as e:
-    print(f"Warning: Could not import radar scripts. Error: {e}")
-    RADAR_SCRIPTS_AVAILABLE = False
+
+from ml_models.radar_pipeline import run_pipeline as download_new_radar_images
+from ml_models.radar_tensor_prep import prepare_radar_tensors
+
+RADAR_SCRIPTS_AVAILABLE = True
 
 DB_FILE = os.path.join(BASE_DIR, "nowcast_history.db")
 XGB_PATH = os.path.join(ML_DIR, "xgboost_multi_model.json")
