@@ -35,3 +35,13 @@ backend/ml_models/radar_sequence_tensor.pt
 .idea/
 .DS_Store
 Thumbs.db
+
+# Local training files - keep on computer, exclude from GitHub
+backend/ml_models/convlstm_model.py
+backend/ml_models/data_labeling.py
+backend/ml_models/labeled_weather_data.csv
+backend/ml_models/multi_region_train.py
+backend/ml_models/xgboost_model.json
+
+# Next.js generated file
+frontend/next-env.d.ts
